@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+PyJWT
+python-multipart
+email-validator
+pypdf
+python-docx
+httpx
