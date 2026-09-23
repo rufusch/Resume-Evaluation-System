@@ -133,3 +133,25 @@ python -m unittest backend.test_hr backend.test_skill_coverage
 ```
 
 The Career Lens rebrand migrates existing browser tokens and saved-analysis keys when the app next loads. Existing SQLite databases gain HR tables on startup without deleting previous analyses.
+
+## Login/signup and Codespaces connection setup
+
+Vite now proxies `/api` to the backend on `127.0.0.1:8000` automatically. The frontend defaults to same-origin API requests, and the Codespaces hostname is allowed automatically. No manual vite.config.js editing or forwarded API hostname is needed. Keep both servers running and open frontend port 5173.
+
+If you previously exported an API address, override it with an empty value in the frontend terminal before starting Vite:
+
+```bash
+export VITE_API_BASE_URL=""
+npm run dev
+```
+
+The empty value also overrides old `.env.local` values. Production hosting must route `/api` to FastAPI or provide a `VITE_API_BASE_URL` before building. For local troubleshooting:
+
+```bash
+curl -i http://127.0.0.1:8000/api/health
+curl -i http://127.0.0.1:5173/api/health
+```
+
+Both should return JSON with `status: healthy`. If only the backend responds, restart Vite with the committed config. If neither responds, start the backend first. Connection errors now show HTTP status or backend-unavailable details instead of an uninformative unexpected-error message.
+
+Frontend API error regression checks: `cd frontend && node test-api.mjs`.

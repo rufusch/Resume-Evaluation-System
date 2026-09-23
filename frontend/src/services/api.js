@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// Same-origin requests work locally and through private Codespaces forwarding.
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
 
 // Migrate old installations once; logout then clears only the current namespace.
 for (const [oldKey, newKey] of [['aura_auth_token', 'career_lens_auth_token'], ['aura_current_analysis_id', 'career_lens_current_analysis_id']]) {
@@ -56,20 +57,28 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        let errorMsg = 'An unexpected error occurred.';
+        let errorMsg = `API request failed (HTTP ${response.status}). Check that the backend is running.`;
         if (typeof data === 'object' && data !== null && data.detail) {
           errorMsg = typeof data.detail === 'string' ? data.detail
             : Array.isArray(data.detail) ? data.detail.map((item) => item.msg).join('; ')
             : [data.detail.message, ...(data.detail.files || []).map((item) => `${item.filename}: ${item.error}`)].filter(Boolean).join(' ');
-        } else if (typeof data === 'string' && data.length > 0) {
+        } else if (typeof data === 'string' && data.length > 0 && !contentType?.includes('text/html')) {
           errorMsg = data;
+        } else if (contentType?.includes('text/html')) {
+          errorMsg = `The API returned a web page instead of JSON (HTTP ${response.status}). Check the frontend API proxy and Codespaces port forwarding.`;
         }
         throw new Error(errorMsg);
       }
 
+      if (!contentType?.includes('application/json')) {
+        throw new Error('The API returned a web page or empty response instead of JSON. Restart the frontend with the updated API proxy configuration.');
+      }
       return data;
     } catch (err) {
       console.error(`API Error on [${options.method || 'GET'} ${endpoint}]:`, err);
+      if (err instanceof TypeError) {
+        throw new Error('Cannot reach the Career Lens API. Start the backend on port 8000 and restart the frontend. In Codespaces, use the frontend port 5173 URL.');
+      }
       throw err;
     }
   }
