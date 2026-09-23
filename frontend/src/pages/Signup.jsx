@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ArrowRight, AlertCircle } from 'lucide-react';
 
 export default function Signup() {
   const { signup } = useAuth();
   const navigate = useNavigate();
+  const isHR = new URLSearchParams(useLocation().search).get('workspace') === 'hr';
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -36,7 +37,7 @@ export default function Signup() {
 
     try {
       await signup(fullName, email, password);
-      navigate('/', { replace: true });
+      navigate(isHR ? '/hr' : '/', { replace: true });
     } catch (err) {
       console.error('Signup error:', err);
       setErrorMessage(err.message || 'Registration failed. Please try again.');
@@ -131,7 +132,7 @@ export default function Signup() {
 
         <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '13.5px', color: 'var(--text-wine-muted)' }}>
           Already have an account?{' '}
-          <Link to="/login" style={{ color: 'var(--btn-cherry-bg)', fontWeight: '600', textDecoration: 'underline' }}>
+          <Link to={isHR ? '/login?workspace=hr' : '/login'} style={{ color: 'var(--btn-cherry-bg)', fontWeight: '600', textDecoration: 'underline' }}>
             Sign In
           </Link>
         </div>

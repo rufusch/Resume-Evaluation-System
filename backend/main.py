@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database import init_db
+from backend.hr import router as hr_router
 from backend.routes.auth_routes import router as auth_router
 from backend.routes.analysis_routes import router as analysis_router
 from backend.routes.interview_routes import router as interview_router
@@ -15,7 +16,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="AI-Powered Resume-Job Matching & Career Preparation System API",
+    title="Career Lens API",
     description="Evidence-based resume matching, recruiter/ATS insights, mock interview coaching, and career simulation.",
     version="1.0.0",
     lifespan=lifespan
@@ -39,6 +40,7 @@ app.add_middleware(
 )
 
 # Register routers
+app.include_router(hr_router)
 app.include_router(auth_router)
 app.include_router(analysis_router)
 app.include_router(interview_router)
@@ -48,7 +50,7 @@ app.include_router(what_if_router)
 def health_check():
     return {
         "status": "healthy",
-        "service": "Resume-Job Matching & Career Preparation API",
+        "service": "Career Lens API",
         "version": "1.0.0"
     }
 

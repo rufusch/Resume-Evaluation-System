@@ -8,6 +8,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [workspace, setWorkspace] = useState(location.state?.from?.pathname === '/hr' || new URLSearchParams(location.search).get('workspace') === 'hr' ? 'hr' : 'candidate');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(location.state?.message || '');
@@ -25,7 +26,7 @@ export default function Login() {
 
     try {
       await login(email, password);
-      const from = location.state?.from?.pathname || '/';
+      const from = workspace === 'hr' ? '/hr' : (location.state?.from?.pathname === '/hr' ? '/' : location.state?.from?.pathname || '/');
       navigate(from, { replace: true });
     } catch (err) {
       console.error('Login error:', err);
@@ -39,10 +40,10 @@ export default function Login() {
       <div className="card-cream" style={{ width: '100%', maxWidth: '440px', padding: '36px' }}>
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <h1 style={{ fontSize: '26px', fontWeight: '700', color: 'var(--text-wine-primary)', marginBottom: '8px' }}>
-            Welcome back.
+            Welcome to Career Lens.
           </h1>
           <p style={{ fontSize: '13.5px', color: 'var(--text-wine-muted)', lineHeight: '1.5' }}>
-            Sign in to continue analyzing your resume and preparing for your next opportunity.
+            Choose your workspace to prepare for a role or review applicants.
           </p>
         </div>
 
@@ -53,6 +54,11 @@ export default function Login() {
           </div>
         )}
 
+        <div className="workspace-switch" aria-label="Workspace">
+          <button type="button" aria-pressed={workspace === 'candidate'} onClick={() => setWorkspace('candidate')}>Candidate</button>
+          <button type="button" aria-pressed={workspace === 'hr'} onClick={() => setWorkspace('hr')}>HR / Recruiter</button>
+        </div>
+        <p style={{ color: 'var(--text-wine-muted)', marginBottom: '18px', fontSize: '13px' }}>{workspace === 'hr' ? 'One job description, multiple resumes, and a review dashboard. Your hiring campaigns are private to your account.' : 'Analyze your resume, explore skill gaps, and prepare for interviews.'}</p>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Email</label>
@@ -106,7 +112,7 @@ export default function Login() {
 
         <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '13.5px', color: 'var(--text-wine-muted)' }}>
           Don't have an account?{' '}
-          <Link to="/signup" style={{ color: 'var(--btn-cherry-bg)', fontWeight: '600', textDecoration: 'underline' }}>
+          <Link to={workspace === 'hr' ? '/signup?workspace=hr' : '/signup'} style={{ color: 'var(--btn-cherry-bg)', fontWeight: '600', textDecoration: 'underline' }}>
             Create one
           </Link>
         </div>

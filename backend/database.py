@@ -69,6 +69,8 @@ def init_db():
     )
     """)
     
+    from backend.hr import init_hr_db
+    init_hr_db(conn)
     conn.commit()
     conn.close()
 

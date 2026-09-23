@@ -5,7 +5,7 @@ const AnalysisContext = createContext(null);
 
 export function AnalysisProvider({ children }) {
   const [analysisId, setAnalysisIdState] = useState(() => {
-    return localStorage.getItem('aura_current_analysis_id') || null;
+    return localStorage.getItem('career_lens_current_analysis_id') || null;
   });
   const [currentAnalysis, setCurrentAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -14,9 +14,9 @@ export function AnalysisProvider({ children }) {
   const setAnalysisId = (id) => {
     setAnalysisIdState(id);
     if (id) {
-      localStorage.setItem('aura_current_analysis_id', id);
+      localStorage.setItem('career_lens_current_analysis_id', id);
     } else {
-      localStorage.removeItem('aura_current_analysis_id');
+      localStorage.removeItem('career_lens_current_analysis_id');
       setCurrentAnalysis(null);
     }
   };
@@ -32,7 +32,7 @@ export function AnalysisProvider({ children }) {
       const data = await api.getAnalysis(id);
       setCurrentAnalysis(data);
       setAnalysisIdState(id);
-      localStorage.setItem('aura_current_analysis_id', id);
+      localStorage.setItem('career_lens_current_analysis_id', id);
     } catch (err) {
       console.error('Error loading analysis:', err);
       setError(err.message || "You don't have access to this analysis.");

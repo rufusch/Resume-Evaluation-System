@@ -40,7 +40,7 @@ export default function Navbar() {
           <div className="logo-badge">
             <Sparkles size={16} />
           </div>
-          <span>AURA CAREER</span>
+          <span>Career Lens</span>
         </Link>
 
         {/* Center Nav Links */}
@@ -85,6 +85,7 @@ export default function Navbar() {
 
         {/* Right Nav State */}
         <div className="navbar-actions">
+          <Link to={isAuthenticated ? "/hr" : "/login?workspace=hr"} className="btn-secondary" style={{ padding: "7px 12px", whiteSpace: "nowrap" }}>HR Dashboard</Link>
           {isAuthenticated ? (
             <div className="user-menu-wrapper" ref={dropdownRef}>
               <button

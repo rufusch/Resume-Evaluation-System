@@ -1,19 +1,26 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
+// Migrate old installations once; logout then clears only the current namespace.
+for (const [oldKey, newKey] of [['aura_auth_token', 'career_lens_auth_token'], ['aura_current_analysis_id', 'career_lens_current_analysis_id']]) {
+  const oldValue = localStorage.getItem(oldKey);
+  if (oldValue && !localStorage.getItem(newKey)) localStorage.setItem(newKey, oldValue);
+  localStorage.removeItem(oldKey);
+}
+
 class ApiClient {
   constructor() {
     this.baseUrl = API_BASE_URL;
   }
 
   getToken() {
-    return localStorage.getItem('aura_auth_token');
+    return localStorage.getItem('career_lens_auth_token');
   }
 
   setToken(token) {
     if (token) {
-      localStorage.setItem('aura_auth_token', token);
+      localStorage.setItem('career_lens_auth_token', token);
     } else {
-      localStorage.removeItem('aura_auth_token');
+      localStorage.removeItem('career_lens_auth_token');
     }
   }
 
@@ -51,7 +58,9 @@ class ApiClient {
       if (!response.ok) {
         let errorMsg = 'An unexpected error occurred.';
         if (typeof data === 'object' && data !== null && data.detail) {
-          errorMsg = data.detail;
+          errorMsg = typeof data.detail === 'string' ? data.detail
+            : Array.isArray(data.detail) ? data.detail.map((item) => item.msg).join('; ')
+            : [data.detail.message, ...(data.detail.files || []).map((item) => `${item.filename}: ${item.error}`)].filter(Boolean).join(' ');
         } else if (typeof data === 'string' && data.length > 0) {
           errorMsg = data;
         }
@@ -63,6 +72,19 @@ class ApiClient {
       console.error(`API Error on [${options.method || 'GET'} ${endpoint}]:`, err);
       throw err;
     }
+  }
+
+  listCampaigns() { return this.request('/api/hr/campaigns'); }
+  createCampaign(body) { return this.request('/api/hr/campaigns', { method: 'POST', body }); }
+  getCampaign(id) { return this.request(`/api/hr/campaigns/${id}`); }
+  reviewApplicant(campaignId, applicantId, body) {
+    return this.request(`/api/hr/campaigns/${campaignId}/applicants/${applicantId}`, { method: 'PATCH', body: JSON.stringify(body) });
+  }
+  previewEmails(id, message) {
+    return this.request(`/api/hr/campaigns/${id}/emails/preview`, { method: 'POST', body: JSON.stringify({ message }) });
+  }
+  sendEmails(id, message, preview_token) {
+    return this.request(`/api/hr/campaigns/${id}/emails/send`, { method: 'POST', body: JSON.stringify({ message, preview_token }) });
   }
 
   // --- Auth Endpoints ---
@@ -101,7 +123,7 @@ class ApiClient {
 
   logout() {
     this.setToken(null);
-    localStorage.removeItem('aura_current_analysis_id');
+    localStorage.removeItem('career_lens_current_analysis_id');
   }
 
   // --- Analysis Endpoints ---

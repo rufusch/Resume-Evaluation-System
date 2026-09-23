@@ -17,6 +17,7 @@ import Interview from './pages/Interview';
 import WhatIf from './pages/WhatIf';
 import History from './pages/History';
 import Account from './pages/Account';
+import HR from './pages/HR';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
             <Navbar />
             <main className="main-content">
               <Routes>
+                <Route path="/hr" element={<ProtectedRoute><HR /></ProtectedRoute>} />
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
