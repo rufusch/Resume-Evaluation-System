@@ -2,7 +2,7 @@ import re
 import math
 from typing import Dict, Any, List, Optional, Tuple
 
-# Comprehensive Tech Taxonomy for NLP/Evidence Extraction
+# Skill vocabulary for resume and job-description evidence extraction
 COMMON_SKILLS = {
     # Programming Languages
     "python": {"category": "Language", "synonyms": ["python3", "py"]},
@@ -11,7 +11,7 @@ COMMON_SKILLS = {
     "java": {"category": "Language", "synonyms": ["core java", "j2ee"]},
     "c++": {"category": "Language", "synonyms": ["cpp", "c plus plus"]},
     "c#": {"category": "Language", "synonyms": ["csharp", "c sharp", ".net"]},
-    "golang": {"category": "Language", "synonyms": ["go lang", "go"]},
+    "golang": {"category": "Language", "synonyms": ["go lang", "go programming"]},
     "rust": {"category": "Language", "synonyms": ["rustlang"]},
     "ruby": {"category": "Language", "synonyms": ["ruby on rails"]},
     "php": {"category": "Language", "synonyms": ["php8"]},
@@ -30,9 +30,9 @@ COMMON_SKILLS = {
     "django": {"category": "Framework", "synonyms": ["django rest framework", "drf"]},
     "flask": {"category": "Framework", "synonyms": []},
     "spring boot": {"category": "Framework", "synonyms": ["spring", "springboot"]},
-    "next.js": {"category": "Framework", "synonyms": ["nextjs", "next"]},
+    "next.js": {"category": "Framework", "synonyms": ["nextjs"]},
     "graphql": {"category": "API", "synonyms": ["apollo", "apollo-graphql"]},
-    "rest api": {"category": "API", "synonyms": ["restful", "rest apis", "rest"]},
+    "rest api": {"category": "API", "synonyms": ["restful", "rest apis"]},
 
     # Cloud & DevOps
     "aws": {"category": "Cloud", "synonyms": ["amazon web services", "ec2", "s3", "lambda", "ecs"]},
@@ -63,7 +63,7 @@ COMMON_SKILLS = {
     "pandas": {"category": "Data", "synonyms": []},
     "numpy": {"category": "Data", "synonyms": []},
     "nlp": {"category": "AI/ML", "synonyms": ["natural language processing", "llm", "transformers"]},
-    "computer vision": {"category": "AI/ML", "synonyms": ["cv", "opencv"]},
+    "computer vision": {"category": "AI/ML", "synonyms": ["opencv"]},
 
     # Architecture & Practices
     "microservices": {"category": "Architecture", "synonyms": ["distributed systems", "service-oriented"]},
@@ -71,6 +71,273 @@ COMMON_SKILLS = {
     "agile": {"category": "Methodology", "synonyms": ["scrum", "kanban", "sprints"]},
     "testing": {"category": "Quality", "synonyms": ["unit testing", "jest", "pytest", "cypress", "tdd"]},
 }
+# Cross-domain vocabulary. Explicit JD skill lists also support terms outside this catalog.
+COMMON_SKILLS.update({
+    # Business & Management
+    'project management': {"category": 'Business & Management', "synonyms": []},
+    'program management': {"category": 'Business & Management', "synonyms": []},
+    'product management': {"category": 'Business & Management', "synonyms": []},
+    'stakeholder management': {"category": 'Business & Management', "synonyms": []},
+    'strategic planning': {"category": 'Business & Management', "synonyms": []},
+    'business analysis': {"category": 'Business & Management', "synonyms": []},
+    'change management': {"category": 'Business & Management', "synonyms": []},
+    'risk management': {"category": 'Business & Management', "synonyms": []},
+    'process improvement': {"category": 'Business & Management', "synonyms": []},
+    'business development': {"category": 'Business & Management', "synonyms": []},
+    'operations management': {"category": 'Business & Management', "synonyms": []},
+    'budgeting': {"category": 'Business & Management', "synonyms": []},
+    'negotiation': {"category": 'Business & Management', "synonyms": []},
+    'leadership': {"category": 'Business & Management', "synonyms": []},
+    'communication': {"category": 'Business & Management', "synonyms": ['written communication', 'verbal communication']},
+    'teamwork': {"category": 'Business & Management', "synonyms": []},
+    'problem solving': {"category": 'Business & Management', "synonyms": ['problem-solving']},
+    'critical thinking': {"category": 'Business & Management', "synonyms": []},
+    'time management': {"category": 'Business & Management', "synonyms": []},
+    'public speaking': {"category": 'Business & Management', "synonyms": []},
+    # Finance & Accounting
+    'financial analysis': {"category": 'Finance & Accounting', "synonyms": []},
+    'financial modeling': {"category": 'Finance & Accounting', "synonyms": ['financial modelling']},
+    'accounting': {"category": 'Finance & Accounting', "synonyms": []},
+    'bookkeeping': {"category": 'Finance & Accounting', "synonyms": []},
+    'auditing': {"category": 'Finance & Accounting', "synonyms": []},
+    'taxation': {"category": 'Finance & Accounting', "synonyms": []},
+    'payroll': {"category": 'Finance & Accounting', "synonyms": []},
+    'accounts payable': {"category": 'Finance & Accounting', "synonyms": []},
+    'accounts receivable': {"category": 'Finance & Accounting', "synonyms": []},
+    'bank reconciliation': {"category": 'Finance & Accounting', "synonyms": []},
+    'financial reporting': {"category": 'Finance & Accounting', "synonyms": []},
+    'investment analysis': {"category": 'Finance & Accounting', "synonyms": []},
+    'portfolio management': {"category": 'Finance & Accounting', "synonyms": []},
+    'credit analysis': {"category": 'Finance & Accounting', "synonyms": []},
+    'valuation': {"category": 'Finance & Accounting', "synonyms": []},
+    'gaap': {"category": 'Finance & Accounting', "synonyms": []},
+    'ifrs': {"category": 'Finance & Accounting', "synonyms": []},
+    'quickbooks': {"category": 'Finance & Accounting', "synonyms": []},
+    'tally': {"category": 'Finance & Accounting', "synonyms": []},
+    'sap fico': {"category": 'Finance & Accounting', "synonyms": []},
+    # Marketing & Sales
+    'digital marketing': {"category": 'Marketing & Sales', "synonyms": []},
+    'content marketing': {"category": 'Marketing & Sales', "synonyms": []},
+    'copywriting': {"category": 'Marketing & Sales', "synonyms": []},
+    'search engine optimization': {"category": 'Marketing & Sales', "synonyms": ['seo']},
+    'search engine marketing': {"category": 'Marketing & Sales', "synonyms": ['sem']},
+    'social media marketing': {"category": 'Marketing & Sales', "synonyms": []},
+    'email marketing': {"category": 'Marketing & Sales', "synonyms": []},
+    'market research': {"category": 'Marketing & Sales', "synonyms": []},
+    'brand management': {"category": 'Marketing & Sales', "synonyms": []},
+    'campaign management': {"category": 'Marketing & Sales', "synonyms": []},
+    'google analytics': {"category": 'Marketing & Sales', "synonyms": []},
+    'google ads': {"category": 'Marketing & Sales', "synonyms": []},
+    'salesforce': {"category": 'Marketing & Sales', "synonyms": []},
+    'hubspot': {"category": 'Marketing & Sales', "synonyms": []},
+    'lead generation': {"category": 'Marketing & Sales', "synonyms": []},
+    'sales forecasting': {"category": 'Marketing & Sales', "synonyms": []},
+    'account management': {"category": 'Marketing & Sales', "synonyms": []},
+    'customer relationship management': {"category": 'Marketing & Sales', "synonyms": ['crm']},
+    'customer service': {"category": 'Marketing & Sales', "synonyms": []},
+    'customer success': {"category": 'Marketing & Sales', "synonyms": []},
+    # Healthcare
+    'patient care': {"category": 'Healthcare', "synonyms": ['patient assessment']},
+    'clinical assessment': {"category": 'Healthcare', "synonyms": []},
+    'nursing': {"category": 'Healthcare', "synonyms": []},
+    'medication administration': {"category": 'Healthcare', "synonyms": []},
+    'infection control': {"category": 'Healthcare', "synonyms": []},
+    'wound care': {"category": 'Healthcare', "synonyms": []},
+    'phlebotomy': {"category": 'Healthcare', "synonyms": []},
+    'medical coding': {"category": 'Healthcare', "synonyms": []},
+    'medical billing': {"category": 'Healthcare', "synonyms": []},
+    'electronic health records': {"category": 'Healthcare', "synonyms": ['ehr', 'emr', 'electronic medical records']},
+    'clinical research': {"category": 'Healthcare', "synonyms": []},
+    'pharmacovigilance': {"category": 'Healthcare', "synonyms": []},
+    'radiology': {"category": 'Healthcare', "synonyms": []},
+    'physiotherapy': {"category": 'Healthcare', "synonyms": []},
+    'nutrition': {"category": 'Healthcare', "synonyms": []},
+    'public health': {"category": 'Healthcare', "synonyms": []},
+    'epidemiology': {"category": 'Healthcare', "synonyms": []},
+    'health education': {"category": 'Healthcare', "synonyms": []},
+    'basic life support': {"category": 'Healthcare', "synonyms": ['bls']},
+    'advanced cardiac life support': {"category": 'Healthcare', "synonyms": ['acls']},
+    # Education
+    'teaching': {"category": 'Education & Training', "synonyms": []},
+    'curriculum development': {"category": 'Education & Training', "synonyms": []},
+    'lesson planning': {"category": 'Education & Training', "synonyms": []},
+    'classroom management': {"category": 'Education & Training', "synonyms": []},
+    'instructional design': {"category": 'Education & Training', "synonyms": []},
+    'assessment design': {"category": 'Education & Training', "synonyms": []},
+    'special education': {"category": 'Education & Training', "synonyms": []},
+    'educational technology': {"category": 'Education & Training', "synonyms": []},
+    'e-learning': {"category": 'Education & Training', "synonyms": ['elearning']},
+    'student counseling': {"category": 'Education & Training', "synonyms": []},
+    'academic research': {"category": 'Education & Training', "synonyms": []},
+    'learning management systems': {"category": 'Education & Training', "synonyms": ['lms']},
+    'moodle': {"category": 'Education & Training', "synonyms": []},
+    'training and development': {"category": 'Education & Training', "synonyms": []},
+    # Legal & Compliance
+    'legal research': {"category": 'Legal & Compliance', "synonyms": []},
+    'contract drafting': {"category": 'Legal & Compliance', "synonyms": []},
+    'contract review': {"category": 'Legal & Compliance', "synonyms": []},
+    'litigation': {"category": 'Legal & Compliance', "synonyms": []},
+    'regulatory compliance': {"category": 'Legal & Compliance', "synonyms": []},
+    'due diligence': {"category": 'Legal & Compliance', "synonyms": []},
+    'intellectual property': {"category": 'Legal & Compliance', "synonyms": []},
+    'corporate law': {"category": 'Legal & Compliance', "synonyms": []},
+    'employment law': {"category": 'Legal & Compliance', "synonyms": []},
+    'data privacy': {"category": 'Legal & Compliance', "synonyms": []},
+    'gdpr': {"category": 'Legal & Compliance', "synonyms": []},
+    'anti-money laundering': {"category": 'Legal & Compliance', "synonyms": ['aml']},
+    'know your customer': {"category": 'Legal & Compliance', "synonyms": ['kyc']},
+    'policy development': {"category": 'Legal & Compliance', "synonyms": []},
+    # Engineering & Manufacturing
+    'autocad': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'solidworks': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'revit': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'catia': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'matlab': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'simulink': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'finite element analysis': {"category": 'Engineering & Manufacturing', "synonyms": ['fea']},
+    'computational fluid dynamics': {"category": 'Engineering & Manufacturing', "synonyms": ['cfd']},
+    'mechanical design': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'electrical design': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'circuit design': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'pcb design': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'embedded systems': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'plc programming': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'scada': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'cnc machining': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'welding': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'quality assurance': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'quality control': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'lean manufacturing': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'six sigma': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'statistical process control': {"category": 'Engineering & Manufacturing', "synonyms": ['spc']},
+    'preventive maintenance': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'root cause analysis': {"category": 'Engineering & Manufacturing', "synonyms": ['rca']},
+    'iso 9001': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'civil engineering': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'structural analysis': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'surveying': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'construction management': {"category": 'Engineering & Manufacturing', "synonyms": []},
+    'building information modeling': {"category": 'Engineering & Manufacturing', "synonyms": ['bim']},
+    # Supply Chain & Logistics
+    'supply chain management': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'procurement': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'inventory management': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'warehouse management': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'demand planning': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'logistics': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'freight forwarding': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'vendor management': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'fleet management': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'transportation planning': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'order fulfillment': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'import export': {"category": 'Supply Chain & Logistics', "synonyms": []},
+    'erp': {"category": 'Supply Chain & Logistics', "synonyms": ['enterprise resource planning']},
+    # Human Resources
+    'recruitment': {"category": 'Human Resources', "synonyms": []},
+    'talent acquisition': {"category": 'Human Resources', "synonyms": []},
+    'employee relations': {"category": 'Human Resources', "synonyms": []},
+    'performance management': {"category": 'Human Resources', "synonyms": []},
+    'compensation and benefits': {"category": 'Human Resources', "synonyms": []},
+    'workforce planning': {"category": 'Human Resources', "synonyms": []},
+    'onboarding': {"category": 'Human Resources', "synonyms": []},
+    'hr analytics': {"category": 'Human Resources', "synonyms": []},
+    'hris': {"category": 'Human Resources', "synonyms": ['human resources information systems']},
+    'workday': {"category": 'Human Resources', "synonyms": []},
+    'succession planning': {"category": 'Human Resources', "synonyms": []},
+    # Design & Media
+    'graphic design': {"category": 'Design & Media', "synonyms": []},
+    'ui design': {"category": 'Design & Media', "synonyms": ['user interface design']},
+    'ux design': {"category": 'Design & Media', "synonyms": ['user experience design']},
+    'user research': {"category": 'Design & Media', "synonyms": []},
+    'usability testing': {"category": 'Design & Media', "synonyms": []},
+    'wireframing': {"category": 'Design & Media', "synonyms": []},
+    'prototyping': {"category": 'Design & Media', "synonyms": []},
+    'figma': {"category": 'Design & Media', "synonyms": []},
+    'adobe photoshop': {"category": 'Design & Media', "synonyms": ['photoshop']},
+    'adobe illustrator': {"category": 'Design & Media', "synonyms": ['illustrator']},
+    'adobe indesign': {"category": 'Design & Media', "synonyms": ['indesign']},
+    'video editing': {"category": 'Design & Media', "synonyms": []},
+    'adobe premiere pro': {"category": 'Design & Media', "synonyms": ['premiere pro']},
+    'after effects': {"category": 'Design & Media', "synonyms": []},
+    'blender': {"category": 'Design & Media', "synonyms": []},
+    'animation': {"category": 'Design & Media', "synonyms": []},
+    'photography': {"category": 'Design & Media', "synonyms": []},
+    'typography': {"category": 'Design & Media', "synonyms": []},
+    'accessibility': {"category": 'Design & Media', "synonyms": []},
+    'technical writing': {"category": 'Design & Media', "synonyms": []},
+    'journalism': {"category": 'Design & Media', "synonyms": []},
+    # Science & Environment
+    'laboratory techniques': {"category": 'Science & Environment', "synonyms": []},
+    'molecular biology': {"category": 'Science & Environment', "synonyms": []},
+    'cell culture': {"category": 'Science & Environment', "synonyms": []},
+    'pcr': {"category": 'Science & Environment', "synonyms": []},
+    'chromatography': {"category": 'Science & Environment', "synonyms": []},
+    'mass spectrometry': {"category": 'Science & Environment', "synonyms": []},
+    'spectroscopy': {"category": 'Science & Environment', "synonyms": []},
+    'bioinformatics': {"category": 'Science & Environment', "synonyms": []},
+    'biostatistics': {"category": 'Science & Environment', "synonyms": []},
+    'chemistry': {"category": 'Science & Environment', "synonyms": []},
+    'microbiology': {"category": 'Science & Environment', "synonyms": []},
+    'environmental impact assessment': {"category": 'Science & Environment', "synonyms": []},
+    'sustainability': {"category": 'Science & Environment', "synonyms": []},
+    'renewable energy': {"category": 'Science & Environment', "synonyms": []},
+    'gis': {"category": 'Science & Environment', "synonyms": ['geographic information systems']},
+    'remote sensing': {"category": 'Science & Environment', "synonyms": []},
+    'agronomy': {"category": 'Science & Environment', "synonyms": []},
+    'soil science': {"category": 'Science & Environment', "synonyms": []},
+    'food safety': {"category": 'Science & Environment', "synonyms": []},
+    'haccp': {"category": 'Science & Environment', "synonyms": []},
+    'good manufacturing practice': {"category": 'Science & Environment', "synonyms": ['gmp']},
+    'good laboratory practice': {"category": 'Science & Environment', "synonyms": ['glp']},
+    # Hospitality & Services
+    'hospitality management': {"category": 'Hospitality & Services', "synonyms": []},
+    'hotel operations': {"category": 'Hospitality & Services', "synonyms": []},
+    'event planning': {"category": 'Hospitality & Services', "synonyms": []},
+    'food and beverage management': {"category": 'Hospitality & Services', "synonyms": []},
+    'culinary arts': {"category": 'Hospitality & Services', "synonyms": []},
+    'menu planning': {"category": 'Hospitality & Services', "synonyms": []},
+    'housekeeping': {"category": 'Hospitality & Services', "synonyms": []},
+    'reservation management': {"category": 'Hospitality & Services', "synonyms": []},
+    'tourism management': {"category": 'Hospitality & Services', "synonyms": []},
+    'retail management': {"category": 'Hospitality & Services', "synonyms": []},
+    'visual merchandising': {"category": 'Hospitality & Services', "synonyms": []},
+    # Data & Office Tools
+    'microsoft excel': {"category": 'Data & Office Tools', "synonyms": ['ms excel', 'excel']},
+    'microsoft word': {"category": 'Data & Office Tools', "synonyms": ['ms word']},
+    'microsoft powerpoint': {"category": 'Data & Office Tools', "synonyms": ['powerpoint', 'ms powerpoint']},
+    'power bi': {"category": 'Data & Office Tools', "synonyms": ['powerbi']},
+    'tableau': {"category": 'Data & Office Tools', "synonyms": []},
+    'data analysis': {"category": 'Data & Office Tools', "synonyms": []},
+    'data visualization': {"category": 'Data & Office Tools', "synonyms": []},
+    'statistical analysis': {"category": 'Data & Office Tools', "synonyms": []},
+    'spss': {"category": 'Data & Office Tools', "synonyms": []},
+    'sas': {"category": 'Data & Office Tools', "synonyms": []},
+    'stata': {"category": 'Data & Office Tools', "synonyms": []},
+    'data entry': {"category": 'Data & Office Tools', "synonyms": []},
+    'google sheets': {"category": 'Data & Office Tools', "synonyms": []},
+    'power query': {"category": 'Data & Office Tools', "synonyms": []},
+    'data governance': {"category": 'Data & Office Tools', "synonyms": []},
+    'data engineering': {"category": 'Data & Office Tools', "synonyms": []},
+    'apache spark': {"category": 'Data & Office Tools', "synonyms": ['pyspark']},
+    'airflow': {"category": 'Data & Office Tools', "synonyms": []},
+    'dbt': {"category": 'Data & Office Tools', "synonyms": []},
+    # Cybersecurity & IT
+    'cybersecurity': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'network security': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'penetration testing': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'incident response': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'digital forensics': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'identity and access management': {"category": 'Cybersecurity & IT', "synonyms": ['iam']},
+    'siem': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'network administration': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'technical support': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'itil': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'cisco': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'tcp/ip': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'dns': {"category": 'Cybersecurity & IT', "synonyms": []},
+    'windows server': {"category": 'Cybersecurity & IT', "synonyms": []},
+})
+
 
 def extract_tokens_and_phrases(text: str) -> List[str]:
     """Generates 1-gram, 2-gram, and 3-gram lowercased tokens from text for exact matching."""
@@ -85,11 +352,31 @@ def extract_tokens_and_phrases(text: str) -> List[str]:
             phrases.append(f"{words[i]} {words[i+1]} {words[i+2]}")
     return phrases
 
+def skill_pattern(term: str) -> str:
+    """Match whole terms, including punctuation-ended skills such as C++ and C#."""
+    return rf"(?<![\w+#]){re.escape(term)}(?![\w+#])"
+
+
+def has_skill(key: str, text: str) -> bool:
+    terms = [key] + COMMON_SKILLS.get(key, {}).get("synonyms", [])
+    return any(re.search(skill_pattern(term), text, re.IGNORECASE) for term in terms)
+
+
+def explicit_skill_terms(line: str) -> List[str]:
+    """Conservative fallback for named skill lists, not arbitrary prose requirements."""
+    match = re.match(r"^(?:(?:required|preferred|technical|core|desired)\s+)?(?:skills|competencies|tools|expertise)\s*:\s*(.+)$", line, re.I)
+    if not match:
+        return []
+    terms = re.split(r"[,;|]", match.group(1))
+    return [term.strip().strip(".") for term in terms
+            if 1 < len(term.strip()) <= 70 and len(term.split()) <= 7]
+
+
 def find_evidence_sentence(keyword: str, text: str) -> Optional[str]:
     """Finds the most specific sentence containing the keyword in the text."""
-    sentences = re.split(r'[\n\.\!\?]+', text)
-    escaped = re.escape(keyword)
-    pattern = re.compile(rf'\b{escaped}\b', re.IGNORECASE)
+    sentences = re.split(r'\n+|(?<=[.!?])\s+', text)
+    terms = [keyword] + COMMON_SKILLS.get(keyword, {}).get('synonyms', [])
+    pattern = re.compile('|'.join(skill_pattern(term) for term in terms), re.IGNORECASE)
     for s in sentences:
         s_clean = s.strip()
         if len(s_clean) > 15 and pattern.search(s_clean):
@@ -148,13 +435,7 @@ def parse_resume_content(resume_text: str) -> Dict[str, Any]:
     detected_skills = {}
     resume_lower = resume_text.lower()
     for skill_name, meta in COMMON_SKILLS.items():
-        found = False
-        patterns = [rf'\b{re.escape(skill_name)}\b'] + [rf'\b{re.escape(syn)}\b' for syn in meta["synonyms"]]
-        for pat in patterns:
-            if re.search(pat, resume_lower):
-                found = True
-                break
-        if found:
+        if has_skill(skill_name, resume_text):
             evidence = find_evidence_sentence(skill_name, resume_text) or f"Identified in resume ({meta['category']})"
             detected_skills[skill_name] = {
                 "name": skill_name.title() if len(skill_name) > 3 else skill_name.upper(),
@@ -256,6 +537,7 @@ def parse_resume_content(resume_text: str) -> Dict[str, Any]:
         "phone": phone,
         "summary": " ".join(sections.get("summary", []))[:300] or "Experienced professional with engineering and technical background.",
         "skills": detected_skills,
+        "work_evidence": "\n".join(sections["experience"] + sections["projects"]),
         "projects": projects,
         "experience": experience_items,
         "education": education_items,
@@ -270,7 +552,7 @@ def parse_job_description(jd_text: str) -> Dict[str, Any]:
     lines = [line.strip() for line in jd_text.split("\n") if line.strip()]
     
     # 1. Job Role & Company extraction
-    job_title = "Software Engineer"
+    job_title = "Target Role"
     company = "Hiring Organization"
     
     for line in lines[:5]:
@@ -278,7 +560,7 @@ def parse_job_description(jd_text: str) -> Dict[str, Any]:
         if title_match:
             job_title = title_match.group(1).strip()
             break
-        elif any(kw in line.lower() for kw in ['engineer', 'developer', 'architect', 'scientist', 'manager', 'lead', 'analyst', 'designer', 'consultant']):
+        elif any(kw in line.lower() for kw in ['engineer', 'developer', 'architect', 'scientist', 'manager', 'lead', 'analyst', 'designer', 'consultant', 'nurse', 'teacher', 'accountant', 'lawyer', 'technician', 'chef', 'officer', 'specialist']):
             if len(line) < 60:
                 job_title = line.strip("#: -")
                 break
@@ -309,8 +591,7 @@ def parse_job_description(jd_text: str) -> Dict[str, Any]:
             preferred_section_active = False
 
         for skill_name, meta in COMMON_SKILLS.items():
-            patterns = [rf'\b{re.escape(skill_name)}\b'] + [rf'\b{re.escape(syn)}\b' for syn in meta["synonyms"]]
-            if any(re.search(pat, low) for pat in patterns):
+            if has_skill(skill_name, low):
                 display_name = skill_name.title() if len(skill_name) > 3 else skill_name.upper()
                 skill_obj = {
                     "name": display_name,
@@ -325,17 +606,19 @@ def parse_job_description(jd_text: str) -> Dict[str, Any]:
                     if not any(s["key"] == skill_name for s in required_skills):
                         required_skills.append(skill_obj)
 
-    # If no required skills matched, extract key noun phrases or default high-demand skills
-    if not required_skills and not preferred_skills:
-        # Fallback extraction from lines with bullet points
-        bullet_reqs = [l.strip("•-* ") for l in lines if len(l) > 20 and len(l) < 150][:6]
-        for idx, br in enumerate(bullet_reqs):
-            required_skills.append({
-                "name": br[:30].title(),
-                "key": br[:30].lower(),
-                "category": "Domain",
-                "is_preferred": False
-            })
+        # Retain explicitly named niche skills even when common skills were also found.
+        for term in explicit_skill_terms(line):
+            if any(has_skill(key, term) for key in COMMON_SKILLS):
+                continue
+            skill_obj = {"name": term, "key": term.lower(), "category": "Domain",
+                         "is_preferred": preferred_section_active}
+            target = preferred_skills if preferred_section_active else required_skills
+            if not any(item["key"] == skill_obj["key"] for item in target):
+                target.append(skill_obj)
+
+    # A required occurrence takes precedence over a repeated preferred occurrence.
+    required_keys = {item["key"] for item in required_skills}
+    preferred_skills = [item for item in preferred_skills if item["key"] not in required_keys]
 
     # Years of experience check
     exp_years = 0
@@ -367,7 +650,11 @@ def analyze_match(resume_text: str, jd_text: str, resume_data: Dict[str, Any], j
     Calculates evidence coverage & qualitative assessment.
     """
     resume_lower = resume_text.lower()
-    resume_skills = resume_data["skills"]
+    resume_skills = dict(resume_data["skills"])
+    for req in jd_data["required_skills"] + jd_data["preferred_skills"]:
+        if req["key"] not in resume_skills and has_skill(req["key"], resume_text):
+            resume_skills[req["key"]] = {"name": req["name"], "category": req["category"],
+                "evidence": find_evidence_sentence(req["key"], resume_text) or req["name"]}
     all_jd_reqs = jd_data["required_skills"] + jd_data["preferred_skills"]
     
     # Always include experience & degree requirement checks
@@ -388,10 +675,11 @@ def analyze_match(resume_text: str, jd_text: str, resume_data: Dict[str, Any], j
         if key in resume_skills:
             evidence = resume_skills[key]["evidence"]
             # Check context: is it merely a keyword in a list or backed by project/role detail?
-            in_projects = any(key in p["title"].lower() or key in [t.lower() for t in p["technologies"]] or key in p["solution"].lower() for p in resume_data["projects"])
-            in_experience = any(key in exp.lower() for exp in resume_data["experience"])
-            
-            if in_projects or in_experience:
+            in_work = has_skill(key, resume_data.get("work_evidence", ""))
+
+            if in_work:
+                evidence = find_evidence_sentence(key, resume_data.get("work_evidence", "")) or evidence
+                resume_skills[key] = {**resume_skills[key], "evidence": evidence}
                 status = "FULL MATCH"
                 full_matches += 1
                 explanation = f"Direct evidence demonstrated in projects/experience: '{evidence[:120]}...'"
@@ -399,14 +687,14 @@ def analyze_match(resume_text: str, jd_text: str, resume_data: Dict[str, Any], j
             else:
                 status = "PARTIAL MATCH"
                 partial_matches += 1
-                explanation = f"Listed in skills section, but lacks explicit project execution evidence or metrics."
-                gap = f"Mentioned as a competency, but missing concrete production metrics or project scope details."
+                explanation = f"Mentioned in the resume, but lacks an example in an experience or project section."
+                gap = f"Add a specific work or practice example describing your contribution and its outcome."
         else:
             # Check if partial synonyms exist
             meta = COMMON_SKILLS.get(key, {"synonyms": []})
             syn_found = None
             for syn in meta.get("synonyms", []):
-                if syn in resume_lower:
+                if re.search(skill_pattern(syn), resume_lower):
                     syn_found = syn
                     break
             
@@ -506,7 +794,7 @@ def analyze_match(resume_text: str, jd_text: str, resume_data: Dict[str, Any], j
     # Pick top 6-8 core technical dimensions
     radar_skills = []
     for r in requirements_output:
-        if r["category"] in ["Technical", "Language", "Framework", "Cloud", "Database", "DevOps", "AI/ML"]:
+        if r["category"] not in ["Education", "Experience"]:
             if r["requirement"] not in [s["skill"] for s in radar_skills]:
                 evidence_score = 90 if r["status"] == "FULL MATCH" else (55 if r["status"] == "PARTIAL MATCH" else (30 if r["status"] == "UNCERTAIN" else 15))
                 expected_score = 90 if not r.get("is_preferred") else 75
@@ -518,19 +806,6 @@ def analyze_match(resume_text: str, jd_text: str, resume_data: Dict[str, Any], j
                 })
         if len(radar_skills) >= 6:
             break
-
-    # If radar items are fewer than 5, populate with detected resume skills
-    if len(radar_skills) < 5:
-        for sk_key, sk_val in list(resume_skills.items())[:6]:
-            if sk_val["name"] not in [s["skill"] for s in radar_skills]:
-                radar_skills.append({
-                    "skill": sk_val["name"],
-                    "expected": 80,
-                    "evidence": 85,
-                    "status": "FULL MATCH"
-                })
-            if len(radar_skills) >= 6:
-                break
 
     # 3. AI Career Brief
     strong_points = [r["requirement"] for r in requirements_output if r["status"] == "FULL MATCH"][:3]
@@ -610,57 +885,45 @@ def analyze_match(resume_text: str, jd_text: str, resume_data: Dict[str, Any], j
     med_priority_gaps = []
     strong_areas = []
 
-    for req in requirements_output:
+    skill_requirements = [r for r in requirements_output if r["category"] not in ["Education", "Experience"]]
+    for req in skill_requirements:
         if req["status"] == "FULL MATCH":
             strong_areas.append({
                 "requirement": req["requirement"],
                 "evidence": req["resume_evidence"] or req["explanation"],
                 "advantage": "Meets or exceeds job description expectations."
             })
-        elif req["status"] in ["NOT EVIDENCED", "PARTIAL MATCH"]:
+        elif req["status"] in ["NOT EVIDENCED", "PARTIAL MATCH", "UNCERTAIN"]:
             gap_item = {
                 "requirement": req["requirement"],
                 "status": req["status"],
                 "evidence": req["resume_evidence"] or "None evidenced",
                 "gap": req["gap"] or "Missing depth in active projects",
                 "reason": f"Essential criteria for {jd_data['job_title']} workflow.",
-                "recommendation": f"Complete a micro-project or add a focused portfolio case study highlighting {req['requirement']}."
+                "recommendation": f"Add a relevant work example or complete appropriate training or supervised practice in {req['requirement']}."
             }
-            if not req.get("is_preferred", False) or req["status"] == "NOT EVIDENCED":
+            if not req.get("is_preferred", False):
                 high_priority_gaps.append(gap_item)
             else:
                 med_priority_gaps.append(gap_item)
 
+    focus_gaps = high_priority_gaps + med_priority_gaps
     roadmap = {
-        "what_to_learn": [f"Deep-dive concepts in {g['requirement']}" for g in high_priority_gaps[:3]] or ["Advanced concurrency & distributed patterns", "Performance telemetry and monitoring"],
-        "projects_to_build": [
-            {
-                "title": f"End-to-End {high_priority_gaps[0]['requirement'] if high_priority_gaps else 'Production Service'} Micro-App",
-                "description": "Construct a containerized application demonstrating API design, persistence layer caching, and automated testing.",
-                "tech_stack": [g["requirement"] for g in high_priority_gaps[:3]] + ["Docker", "PostgreSQL"]
-            },
-            {
-                "title": "Observability & Benchmarking Pipeline",
-                "description": "Implement metric tracing and load simulation to generate verifiable latency and throughput numbers for your resume.",
-                "tech_stack": ["Prometheus", "FastAPI / Node", "GitHub Actions"]
-            }
-        ],
-        "certifications_to_consider": [
-            "AWS Certified Solutions Architect – Associate",
-            "HashiCorp Certified: Terraform Associate",
-            "Certified Kubernetes Application Developer (CKAD)"
-        ],
-        "resources": [
-            {"title": "System Design Primer", "type": "Repository / Guide", "focus": "Architectural scalability and trade-offs"},
-            {"title": "Official Documentation & Tutorials", "type": "Documentation", "focus": f"{', '.join([g['requirement'] for g in high_priority_gaps[:2]]) or 'Cloud deployment'}"},
-            {"title": "NeetCode & Real-World Engineering Patterns", "type": "Practice", "focus": "Algorithmic depth and practical design"}
-        ],
-        "sequence": [
-            "1. Bridge High-Priority gaps with a dedicated 48-hour build sprint.",
-            "2. Update resume bullet points with quantified outcomes from existing projects.",
-            "3. Rehearse technical rationale behind design decisions for your mock interview.",
-            "4. Validate deployment and CI/CD pipelines on your public GitHub profile."
-        ]
+        "what_to_learn": [f"Practice {g['requirement']} and document a relevant outcome." for g in focus_gaps[:5]],
+        "projects_to_build": [{
+            "title": f"{g['requirement']} applied case study",
+            "description": "Describe a relevant task, your method, and its outcome. Use a practice scenario or anonymized work sample appropriate to your profession.",
+            "tech_stack": [g["requirement"]]
+        } for g in focus_gaps[:3]],
+        "certifications_to_consider": [],
+        "resources": [{"title": "Relevant professional guidance and training", "type": "Learning",
+                       "focus": g["requirement"]} for g in focus_gaps[:3]],
+        "sequence": ([
+            "1. Address required skills with missing or incomplete evidence first.",
+            "2. Add truthful examples of the task, your contribution, and the outcome.",
+            "3. Review preferred skills after required gaps.",
+            "4. Reassess the updated resume against the same job description."
+        ] if focus_gaps else ["Maintain specific examples for the matched skills and review them for each new role."])
     }
 
     # 6. Generate 5-7 Personalized Interview Questions
@@ -737,6 +1000,19 @@ def analyze_match(resume_text: str, jd_text: str, resume_data: Dict[str, Any], j
         },
         "projects": resume_data["projects"],
         "skill_gaps": {
+            "matched": [r for r in skill_requirements if r["status"] == "FULL MATCH"],
+            "partial": [r for r in skill_requirements if r["status"] == "PARTIAL MATCH"],
+            "missing": [r for r in skill_requirements if r["status"] == "NOT EVIDENCED"],
+            "uncertain": [r for r in skill_requirements if r["status"] == "UNCERTAIN"],
+            "summary": {
+                "total": len(skill_requirements),
+                "matched": sum(r["status"] == "FULL MATCH" for r in skill_requirements),
+                "partial": sum(r["status"] == "PARTIAL MATCH" for r in skill_requirements),
+                "missing": sum(r["status"] == "NOT EVIDENCED" for r in skill_requirements),
+                "uncertain": sum(r["status"] == "UNCERTAIN" for r in skill_requirements),
+                "required_gaps": len(high_priority_gaps),
+                "preferred_gaps": len(med_priority_gaps)
+            },
             "high_priority": high_priority_gaps,
             "medium_priority": med_priority_gaps,
             "strong_areas": strong_areas,

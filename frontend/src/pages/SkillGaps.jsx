@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAnalysis } from '../context/AnalysisContext';
 import RadarChart from '../components/RadarChart';
-import { Target, BookOpen, Hammer, Award, ExternalLink, ArrowRight, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
+import StatusBadge from '../components/StatusBadge';
+import { Target, BookOpen, Hammer, Award, ArrowRight, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
 
 export default function SkillGaps() {
   const { analysisId } = useParams();
@@ -37,6 +38,20 @@ export default function SkillGaps() {
   const skillGaps = currentAnalysis.skill_gaps || { high_priority: [], medium_priority: [], strong_areas: [], roadmap: {} };
   const roadmap = skillGaps.roadmap || {};
   const radarData = currentAnalysis.radar_data || [];
+  // Derive from saved requirements too, so older analyses remain readable.
+  const skills = (currentAnalysis.requirements || []).filter(
+    (item) => !['Education', 'Experience'].includes(item.category)
+  );
+  const groups = [
+    { title: 'Matched skills', status: 'FULL MATCH', color: '#1B5E20', background: '#F1F8F2', empty: 'No skills have demonstrated work evidence yet.' },
+    { title: 'Partially evidenced skills', status: 'PARTIAL MATCH', color: '#805000', background: '#FFF8E1', empty: 'No partially evidenced skills.' },
+    { title: 'Missing skills', status: 'NOT EVIDENCED', color: '#A32135', background: '#FFF0F2', empty: 'No missing skills detected among the recognized requirements.' },
+    { title: 'Needs verification', status: 'UNCERTAIN', color: '#4A4275', background: '#F3F0FA', empty: 'No skills awaiting verification.' },
+  ].map((group) => ({ ...group, items: skills.filter((item) => item.status === group.status) }));
+  const requiredGaps = skills.filter((item) => !item.is_preferred && item.status !== 'FULL MATCH');
+  const preferredGaps = skills.filter((item) => item.is_preferred && item.status !== 'FULL MATCH');
+  const priorities = [...requiredGaps, ...preferredGaps].slice(0, 3);
+
 
   return (
     <div className="container" style={{ paddingTop: '32px' }}>
@@ -54,8 +69,55 @@ export default function SkillGaps() {
         </p>
       </div>
 
+      <section className="card-cream" aria-labelledby="skill-gap-summary" style={{ marginBottom: '24px' }}>
+        <h2 id="skill-gap-summary" style={{ color: 'var(--text-wine-primary)', fontSize: '24px', marginBottom: '12px' }}>Skill gap summary</h2>
+        {skills.length ? (
+          <>
+            <p style={{ color: 'var(--text-wine-secondary)', lineHeight: '1.7' }}>
+              Of {skills.length} recognized job skills, <strong>{groups[0].items.length} matched</strong>,{' '}
+              <strong>{groups[1].items.length} partially evidenced</strong>,{' '}
+              <strong>{groups[2].items.length} missing from the resume</strong>, and{' '}
+              <strong>{groups[3].items.length} need verification</strong>.
+              {' '}{requiredGaps.length} required and {preferredGaps.length} preferred skills need attention.
+            </p>
+            <p style={{ color: 'var(--text-wine-primary)', marginTop: '10px' }}>
+              <strong>Next step: </strong>
+              {priorities.length
+                ? `Prioritize ${priorities.map((item) => item.requirement).join(', ')}. Add specific work evidence for skills you have; plan learning or supervised practice for skills you need.`
+                : 'All recognized job skills have work evidence. Keep these examples specific and relevant to the role.'}
+            </p>
+          </>
+        ) : (
+          <p style={{ color: 'var(--text-wine-secondary)' }}>No skill requirements were recognized. Add an explicit “Skills: skill one, skill two” list to the job description and run a new analysis.</p>
+        )}
+        <p style={{ color: 'var(--text-wine-muted)', fontSize: '13px', marginTop: '12px' }}>
+          Missing means not evidenced in this resume, not that you lack the skill. Counts exclude education and years of experience.
+        </p>
+      </section>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px', marginBottom: '32px' }}>
+        {groups.map((group) => (
+          <section key={group.status} aria-label={group.title} style={{ background: group.background, border: `1px solid ${group.color}`, borderRadius: 'var(--radius-md)', padding: '20px' }}>
+            <h2 style={{ color: group.color, fontSize: '20px', marginBottom: '14px' }}>{group.title} ({group.items.length})</h2>
+            {group.items.length ? (
+              <ul style={{ listStyle: 'none', padding: 0, display: 'grid', gap: '14px' }}>
+                {group.items.map((item) => (
+                  <li key={item.requirement} style={{ background: '#fff', borderRadius: '8px', padding: '14px', color: 'var(--text-wine-primary)', overflowWrap: 'anywhere' }}>
+                    <strong>{item.requirement}</strong>
+                    <div style={{ margin: '6px 0', fontSize: '12px' }}>{item.is_preferred ? 'Preferred' : 'Required'} · {item.category}</div>
+                    <StatusBadge status={item.status} />
+                    <p style={{ marginTop: '8px', fontSize: '13px', lineHeight: '1.6' }}>{item.resume_evidence || item.gap || item.explanation}</p>
+                    {item.resume_evidence && item.gap && <p style={{ marginTop: '6px', fontSize: '13px' }}><strong>Gap: </strong>{item.gap}</p>}
+                  </li>
+                ))}
+              </ul>
+            ) : <p style={{ color: group.color, fontSize: '14px' }}>{group.empty}</p>}
+          </section>
+        ))}
+      </div>
+
       {/* Dual Radar Chart & Explanatory Box */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 440px) 1fr', gap: '24px', marginBottom: '36px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '24px', marginBottom: '36px' }}>
         <div className="card-cream" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ width: '100%', marginBottom: '12px' }}>
             <h3 style={{ fontSize: '17px', fontWeight: '700', color: 'var(--text-wine-primary)' }}>
@@ -87,7 +149,7 @@ export default function SkillGaps() {
             Recruiters and automated systems evaluate what is explicitly verifiable in project descriptions and metrics.
           </p>
           <div style={{ background: '#ffffff', padding: '14px 18px', borderRadius: 'var(--radius-md)', border: '1px solid var(--card-blush-border)', fontSize: '13px', color: 'var(--text-wine-secondary)' }}>
-            <strong>Action Rule:</strong> Prioritize adding concrete bullet points and code references for High Priority items rather than listing dozens of unevidenced keywords.
+            <strong>Action Rule:</strong> Prioritize adding concrete bullet points and relevant work samples for High Priority items rather than listing dozens of unevidenced keywords.
           </div>
         </div>
       </div>
@@ -110,7 +172,8 @@ export default function SkillGaps() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+          {!(skillGaps.high_priority || []).length && <p style={{ color: 'var(--text-wine-muted)' }}>No required skill gaps detected.</p>}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '16px' }}>
             {(skillGaps.high_priority || []).map((gap, idx) => (
               <div
                 key={`hp-${idx}`}
@@ -125,7 +188,7 @@ export default function SkillGaps() {
                   <h4 style={{ fontSize: '15.5px', fontWeight: '700', color: 'var(--text-wine-primary)' }}>
                     {gap.requirement}
                   </h4>
-                  <span className="status-pill status-missing">Missing / Low</span>
+                  <StatusBadge status={gap.status || 'NOT EVIDENCED'} />
                 </div>
 
                 <div style={{ fontSize: '13px', color: 'var(--text-wine-secondary)', marginBottom: '10px' }}>
@@ -141,7 +204,7 @@ export default function SkillGaps() {
         </div>
 
         {/* Medium Priority & Strong Areas Split */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
           {/* Medium Priority */}
           <div className="card-cream">
             <h3 style={{ fontSize: '17px', fontWeight: '700', color: 'var(--text-wine-primary)', marginBottom: '14px' }}>
@@ -205,6 +268,7 @@ export default function SkillGaps() {
               <span>What to Learn Next</span>
             </div>
             <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: 'var(--text-wine-secondary)' }}>
+              {!(roadmap.what_to_learn || []).length && <li>No additional learning priorities detected.</li>}
               {(roadmap.what_to_learn || []).map((item, idx) => (
                 <li key={`wtl-${idx}`}>{item}</li>
               ))}
@@ -231,6 +295,7 @@ export default function SkillGaps() {
               <span>Certifications to Consider</span>
             </div>
             <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: 'var(--text-wine-secondary)' }}>
+              {!(roadmap.certifications_to_consider || []).length && <li>No specific certification recommendation. Check the role’s professional requirements.</li>}
               {(roadmap.certifications_to_consider || []).map((c, idx) => (
                 <li key={`cert-${idx}`}>{c}</li>
               ))}
@@ -242,9 +307,9 @@ export default function SkillGaps() {
         <div>
           <div style={{ fontWeight: '700', fontSize: '15px', color: 'var(--text-wine-primary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Hammer size={16} color="var(--btn-cherry-bg)" />
-            <span>Targeted Portfolio Projects to Build</span>
+            <span>Targeted Practice & Work Samples</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '16px' }}>
             {(roadmap.projects_to_build || []).map((p, idx) => (
               <div key={`pb-${idx}`} style={{ background: '#ffffff', border: '1px solid var(--card-cream-border)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
                 <div style={{ fontWeight: '700', fontSize: '14.5px', color: 'var(--text-wine-primary)', marginBottom: '4px' }}>

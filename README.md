@@ -82,3 +82,17 @@ Dependencies were verified using pnpm with package.json version ranges and a hoi
 - `requirements.txt`: dependency list added for setup; versions are unpinned.
 
 Generated builds, caches, virtual environments, local environment files, and SQLite databases are excluded. Review CORS and secret configuration before deploying publicly.
+
+## Cross-domain skill gaps
+
+The engine includes 304 canonical skills spanning software, finance, healthcare, education, legal, engineering, logistics, HR, design, science, hospitality, marketing, and general business skills. Aliases map common abbreviations to canonical skills. For a niche skill outside this vocabulary, use an explicit comma-separated job-description list, for example `Required skills: Python, marine habitat mapping`.
+
+The Skill Gaps page separates matched, partially evidenced, missing, and uncertain skills, shows evidence and required/preferred labels, and summarizes counts and next priorities. Education and experience requirements are excluded from skill counts. A skill merely listed in the resume is partial; a full match requires its name or alias in an original experience/project section. This remains heuristic text matching, not verification of professional competence or exhaustive coverage of every domain.
+
+Run a new analysis to apply the expanded vocabulary and updated matching logic. Previously saved analyses retain their original results, but their skill requirements are grouped in the new UI.
+
+Regression tests:
+
+```sh
+python -m unittest backend.test_skill_coverage
+```
